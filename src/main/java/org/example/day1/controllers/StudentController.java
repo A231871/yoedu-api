@@ -3,7 +3,6 @@ package org.example.day1.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.day1.common.ApiResponse;
-import org.example.day1.common.exception.NotFoundException;
 import org.example.day1.dto.student.StudentResponse;
 import org.example.day1.dto.student.StudentUpsertRequest;
 import org.example.day1.service.StudentService;
@@ -42,13 +41,8 @@ public class StudentController {
 
     @PutMapping("{id}")
     public ResponseEntity<ApiResponse<StudentResponse>> update(@PathVariable("id") Long id,
-                                                       @RequestBody StudentUpsertRequest req) {
-        Optional<StudentResponse> updateStudent = Optional.ofNullable(studentService.update(id, req));
-        if(updateStudent.isPresent()) {
-            return ResponseEntity.ok(ApiResponse.success(updateStudent.get()));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+                                                               @Valid @RequestBody StudentUpsertRequest req) {
+        return ResponseEntity.ok(ApiResponse.success(studentService.update(id, req)));
     }
 
     @DeleteMapping("{id}")

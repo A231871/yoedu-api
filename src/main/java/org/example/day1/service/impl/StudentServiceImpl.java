@@ -2,6 +2,7 @@ package org.example.day1.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.day1.common.exception.NotFoundException;
+import org.example.day1.domain.entity.Parent;
 import org.example.day1.domain.entity.Student;
 import org.example.day1.dto.student.StudentResponse;
 import org.example.day1.dto.student.StudentUpsertRequest;
@@ -35,8 +36,7 @@ public class StudentServiceImpl implements StudentService {
 
     public StudentResponse save(StudentUpsertRequest req){
         Student stu = modelMapper.map(req, Student.class);
-        parentRepository.findById(req.getParentId())
-                .ifPresent(parent->stu.setParent(parent));
+        stu.setParent(resolveParent(req.getParentId()));
         stu.setCreatedAt(LocalDateTime.now());
         stu.setUpdatedAt(LocalDateTime.now());
         Student result = studentRepository.save(stu);
@@ -44,26 +44,41 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public StudentResponse update(Long id,StudentUpsertRequest req){
-        Student stu = modelMapper.map(req, Student.class);
-        stu.setId(id);
-        parentRepository.findById(req.getParentId())
-                .ifPresent(parent->stu.setParent(parent));
+        Student stu = studentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Student not found with id: " + id));
+        stu.setStudentCode(req.getStudentCode());
+        stu.setFullName(req.getFullName());
+        stu.setDateOfBirth(req.getDateOfBirth());
+        stu.setGender(req.getGender());
+        stu.setGradeLevel(req.getGradeLevel());
+        stu.setSchoolName(req.getSchoolName());
+        stu.setPhone(req.getPhone());
+        stu.setParent(resolveParent(req.getParentId()));
+        stu.setStatus(req.getStatus());
+        stu.setLatestScore(req.getLatestScore());
+        stu.setNote(req.getNote());
         stu.setUpdatedAt(LocalDateTime.now());
         Student result = studentRepository.save(stu);
         return map(result);
     }
 
     public void delete(Long id) {
-        // Check if the student exists first
         if (!studentRepository.existsById(id)) {
-            throw new NotFoundException("Student not found mimi");
+            throw new NotFoundException("Student not found with id: " + id);
         }
-        // If it exists, delete it
         studentRepository.deleteById(id);
     }
 
     public StudentResponse map(Student student) {
         return modelMapper.map(student, StudentResponse.class);
+    }
+
+    private Parent resolveParent(Long parentId) {
+        if (parentId == null) {
+            return null;
+        }
+        return parentRepository.findById(parentId)
+                .orElseThrow(() -> new NotFoundException("Parent not found with id: " + parentId));
     }
 //    public List<Student> findAll() {
 //        return studentRepository.findAll();

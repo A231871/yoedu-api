@@ -1,8 +1,10 @@
 package org.example.day1.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.day1.common.ApiResponse;
-import org.example.day1.domain.entity.Parent;
+import org.example.day1.dto.parent.ParentResponse;
+import org.example.day1.dto.parent.ParentUpsertRequest;
 import org.example.day1.service.ParentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +20,13 @@ public class ParentController {
     private final ParentService parentService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Parent>>> findAll() {
+    public ResponseEntity<ApiResponse<List<ParentResponse>>> findAll() {
         return ResponseEntity.ok(ApiResponse.success(parentService.findAll()));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ApiResponse<Parent>> findById(@PathVariable("id") Long id) {
-        Optional<Parent> parent = parentService.findById(id);
+    public ResponseEntity<ApiResponse<ParentResponse>> findById(@PathVariable("id") Long id) {
+        Optional<ParentResponse> parent = parentService.findById(id);
         if(parent.isPresent()) {
             return ResponseEntity.ok(ApiResponse.success(parent.get()));
         } else {
@@ -33,27 +35,19 @@ public class ParentController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Parent>> save(@RequestBody Parent parent) {
-        return ResponseEntity.ok(ApiResponse.success(parentService.save(parent)));
+    public ResponseEntity<ApiResponse<ParentResponse>> save(@Valid @RequestBody ParentUpsertRequest req) {
+        return ResponseEntity.ok(ApiResponse.success(parentService.save(req)));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<ApiResponse<Parent>> update(@PathVariable("id") Long id,
-                                                      @RequestBody Parent parent) {
-        Optional<Parent> updateParent = parentService.update(id, parent);
-        if(updateParent.isPresent()) {
-            return ResponseEntity.ok(ApiResponse.success(updateParent.get()));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ApiResponse<ParentResponse>> update(@PathVariable("id") Long id,
+                                                              @Valid @RequestBody ParentUpsertRequest req) {
+        return ResponseEntity.ok(ApiResponse.success(parentService.update(id, req)));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {
-        if(parentService.delete(id)) {
-            return ResponseEntity.ok(ApiResponse.successMessage("Success"));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        parentService.delete(id);
+        return ResponseEntity.ok(ApiResponse.successMessage("Success"));
     }
 }

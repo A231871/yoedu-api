@@ -1,17 +1,14 @@
 package org.example.day1.dto.student;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.day1.domain.entity.Parent;
 import org.example.day1.domain.enums.Gender;
 import org.example.day1.domain.enums.StudentStatus;
 import org.example.day1.dto.parent.ParentResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
