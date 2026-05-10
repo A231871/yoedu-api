@@ -1,9 +1,13 @@
 package org.example.day1.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.day1.common.exception.NotFoundException;
 import org.example.day1.domain.entity.Teacher;
+import org.example.day1.dto.teacher.TeacherResponse;
+import org.example.day1.dto.teacher.TeacherUpsertRequest;
 import org.example.day1.repository.TeacherRepository;
 import org.example.day1.service.TeacherService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,41 +17,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepository;
+    private final ModelMapper modelMapper;
 
-    public List<Teacher> findAll() {
-        return teacherRepository.findAll();
+    public List<TeacherResponse> findAll() {
+        return teacherRepository.findAll().stream()
+                .map(this::map)
+                .toList();
     }
 
-    public Optional<Teacher> findById(Long id) {
-        return teacherRepository.findById(id);
+    public Optional<TeacherResponse> findById(Long id) {
+        return teacherRepository.findById(id)
+                .map(this::map);
     }
 
-    public Teacher save(Teacher teacher) {
-        return teacherRepository.save(teacher);
+    public TeacherResponse save(TeacherUpsertRequest req) {
+        Teacher teacher = modelMapper.map(req, Teacher.class);
+        return map(teacherRepository.save(teacher));
     }
 
-    public Optional<Teacher> update(Long id, Teacher teacher) {
-        Optional<Teacher> currentTeacher = teacherRepository.findById(id);
-        if(currentTeacher.isPresent()) {
-            Teacher updateTeacher = currentTeacher.get();
-            updateTeacher.setTeacherCode(teacher.getTeacherCode());
-            updateTeacher.setFullName(teacher.getFullName());
-            updateTeacher.setPhone(teacher.getPhone());
-            updateTeacher.setEmail(teacher.getEmail());
-            updateTeacher.setTeacherRole(teacher.getTeacherRole());
-            updateTeacher.setCccdImageUrl(teacher.getCccdImageUrl());
-            updateTeacher.setIsActive(teacher.getIsActive());
-            return Optional.of(teacherRepository.save(updateTeacher));
+    public TeacherResponse update(Long id, TeacherUpsertRequest req) {
+        Teacher updateTeacher = teacherRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Teacher not found with id: " + id));
+        updateTeacher.setTeacherCode(req.getTeacherCode());
+        updateTeacher.setFullName(req.getFullName());
+        updateTeacher.setPhone(req.getPhone());
+        updateTeacher.setEmail(req.getEmail());
+        updateTeacher.setTeacherRole(req.getTeacherRole());
+        updateTeacher.setCccdImageUrl(req.getCccdImageUrl());
+        updateTeacher.setIsActive(req.getIsActive());
+        return map(teacherRepository.save(updateTeacher));
+    }
+
+    public void delete(Long id) {
+        if (!teacherRepository.existsById(id)) {
+            throw new NotFoundException("Teacher not found with id: " + id);
         }
-        return Optional.empty();
+        teacherRepository.deleteById(id);
     }
 
-    public boolean delete(Long id) {
-        Optional<Teacher> teacher = teacherRepository.findById(id);
-        if(teacher.isPresent()) {
-            teacherRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public TeacherResponse map(Teacher teacher) {
+        return modelMapper.map(teacher, TeacherResponse.class);
     }
 }

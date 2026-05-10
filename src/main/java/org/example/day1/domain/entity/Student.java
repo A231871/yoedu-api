@@ -1,10 +1,6 @@
 package org.example.day1.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.example.day1.domain.AuditableEntity;
 import org.example.day1.domain.enums.Gender;
@@ -27,7 +23,7 @@ public class Student extends AuditableEntity {
     private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('MALE', 'FEMALE', 'OTHER')", nullable = false)
+    @Column(nullable = false, length = 10)
     private Gender gender = Gender.OTHER;
 
     @Column(name = "grade_level", columnDefinition = "VARCHAR(30)")
@@ -38,12 +34,13 @@ public class Student extends AuditableEntity {
 
     @Column(columnDefinition = "VARCHAR(20)")
     private String phone;
-
-    @Column(name = "parent_id")
-    private Long parentId;
+    // <- EAGER: Load tat ca data trong bang cung 1 luc, LAZY: Khi su dung moi load
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "parent_id")
+    private Parent parent;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ACTIVE', 'PAUSED', 'DROPPED')", nullable = false)
+    @Column(nullable = false, length = 20)
     private StudentStatus status = StudentStatus.ACTIVE;
 
     @Column(name = "latest_score", columnDefinition = "DECIMAL(5,2)")

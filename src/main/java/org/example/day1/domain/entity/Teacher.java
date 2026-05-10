@@ -26,7 +26,7 @@ public class Teacher extends AuditableEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "teacher_role", columnDefinition = "ENUM('TEACHER', 'ASSISTANT', 'BOTH')", nullable = false)
+    @Column(nullable = false, length = 20)
     private TeacherRole teacherRole = TeacherRole.TEACHER;
 
     @Column(name = "cccd_image_url", columnDefinition = "VARCHAR(255)")

@@ -1,14 +1,15 @@
 package org.example.day1.service;
 
-import org.example.day1.domain.entity.Parent;
+import org.example.day1.dto.parent.ParentResponse;
+import org.example.day1.dto.parent.ParentUpsertRequest;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ParentService {
-    List<Parent> findAll();
-    Optional<Parent> findById(Long id);
-    Parent save(Parent parent);
-    Optional<Parent> update(Long id, Parent parent);
-    boolean delete(Long id);
+    List<ParentResponse> findAll();
+    Optional<ParentResponse> findById(Long id);
+    ParentResponse save(ParentUpsertRequest req);
+    ParentResponse update(Long id, ParentUpsertRequest req);
+    void delete(Long id);
 }

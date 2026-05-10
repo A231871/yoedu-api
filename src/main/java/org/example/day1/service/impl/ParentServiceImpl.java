@@ -1,9 +1,13 @@
 package org.example.day1.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.day1.common.exception.NotFoundException;
 import org.example.day1.domain.entity.Parent;
+import org.example.day1.dto.parent.ParentResponse;
+import org.example.day1.dto.parent.ParentUpsertRequest;
 import org.example.day1.repository.ParentRepository;
 import org.example.day1.service.ParentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,38 +17,44 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ParentServiceImpl implements ParentService {
     private final ParentRepository parentRepository;
+    private final ModelMapper modelMapper;
 
-    public List<Parent> findAll() {
-        return parentRepository.findAll();
+    public List<ParentResponse> findAll() {
+        return parentRepository.findAll().stream()
+                .map(this::map)
+                .toList();
     }
 
-    public Optional<Parent> findById(Long id) {
-        return parentRepository.findById(id);
+    public Optional<ParentResponse> findById(Long id) {
+        return parentRepository.findById(id)
+                .map(this::map);
     }
 
-    public Parent save(Parent parent) {
-        return parentRepository.save(parent);
+    public ParentResponse save(ParentUpsertRequest req) {
+        Parent parent = modelMapper.map(req, Parent.class);
+        return map(parentRepository.save(parent));
     }
 
-    public Optional<Parent> update(Long id, Parent parent) {
-        Optional<Parent> currentParent = parentRepository.findById(id);
-        if(currentParent.isPresent()) {
-            Parent updateParent = currentParent.get();
-            updateParent.setFullName(parent.getFullName());
-            updateParent.setPhone(parent.getPhone());
-            updateParent.setEmail(parent.getEmail());
-            updateParent.setAddress(parent.getAddress());
-            return Optional.of(parentRepository.save(updateParent));
+    public ParentResponse update(Long id, ParentUpsertRequest req) {
+        Parent updateParent = parentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Parent not found with id: " + id));
+        updateParent.setFullName(req.getFullName());
+        updateParent.setPhone(req.getPhone());
+        updateParent.setEmail(req.getEmail());
+        updateParent.setAddress(req.getAddress());
+        updateParent.setRelationship(req.getRelationship());
+        updateParent.setGender(req.getGender());
+        return map(parentRepository.save(updateParent));
+    }
+
+    public void delete(Long id) {
+        if (!parentRepository.existsById(id)) {
+            throw new NotFoundException("Parent not found with id: " + id);
         }
-        return Optional.empty();
+        parentRepository.deleteById(id);
     }
 
-    public boolean delete(Long id) {
-        Optional<Parent> parent = parentRepository.findById(id);
-        if(parent.isPresent()) {
-            parentRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public ParentResponse map(Parent parent) {
+        return modelMapper.map(parent, ParentResponse.class);
     }
 }
