@@ -19,6 +19,10 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final ModelMapper modelMapper;
 
+    public List<Course> findByCourseActive(){
+        return courseRepository.findByCourseActive();
+    }
+
     public List<CourseResponse> findAll() {
         return courseRepository.findAll().stream()
                 .map(this::map)
