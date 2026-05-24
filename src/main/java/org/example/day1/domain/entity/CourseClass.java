@@ -44,7 +44,7 @@ public class CourseClass extends AuditableEntity {
 
     private int maxStudents;
 
-    @Column(columnDefinition = "decimal", precision = 12, scale = 2)
+    @Column(columnDefinition = "DECIMAL(12,2)")
     private double tuitionFee;
 
     @Enumerated(EnumType.STRING)
