@@ -3,7 +3,7 @@ package org.example.day1.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.day1.domain.AuditableEntity;
+import org.example.day1.domain.BaseEntity;
 import org.example.day1.domain.enums.NotificationRecipientType;
 import org.example.day1.domain.enums.NotificationType;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "notifications")
 @Getter
 @Setter
-public class Notification extends AuditableEntity {
+public class Notification extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "recipient_type", nullable = false, length = 20)
     private NotificationRecipientType recipientType;
