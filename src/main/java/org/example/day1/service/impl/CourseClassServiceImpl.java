@@ -11,6 +11,7 @@ import org.example.day1.repository.*;
 import org.example.day1.service.CourseClassService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,5 +92,10 @@ public class CourseClassServiceImpl implements CourseClassService {
         } else {
             throw new NotFoundException("Course not exists");
         }
+    }
+    @Transactional(readOnly = true)
+    public CourseClass getCourseClass(Long id) throws NotFoundException {
+        return courseClassRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Course class not found: " + id));
     }
 }

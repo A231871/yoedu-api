@@ -1,5 +1,7 @@
 package org.example.day1.service;
 
+import org.example.day1.common.exception.NotFoundException;
+import org.example.day1.domain.entity.Student;
 import org.example.day1.dto.student.StudentResponse;
 import org.example.day1.dto.student.StudentUpsertRequest;
 
@@ -17,4 +19,6 @@ public interface StudentService {
     StudentResponse save(StudentUpsertRequest req);
     StudentResponse update(Long id,StudentUpsertRequest req);
     void delete(Long id);
+    Student getStudentForParent(Long studentId, Long parentId) throws NotFoundException;
+    Student getStudent(Long id) throws NotFoundException;
 }
